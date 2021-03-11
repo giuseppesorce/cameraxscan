@@ -212,29 +212,25 @@ class ScanBarcodeFragment : Fragment() {
         ImageAnalysis.Analyzer {
 
         private val scanner = BarcodeScanning.getClient()
+        private var isBusy = AtomicBoolean(false)
         @SuppressLint("UnsafeExperimentalUsageError")
-        override fun analyze(imageProxy: ImageProxy) {
-            val mediaImage = imageProxy.image
-            if (mediaImage != null) {
-                val image =
-                    InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-                // Pass image to the scanner and have it do its thing
-                scanner.process(image)
-                    .addOnSuccessListener { barcodes ->
-
-                        for (barcode in barcodes) {
-
-                            barcodeListener(barcode.rawValue ?: "")
-                            binding.myView.setBounds(barcode.boundingBox)
+        override fun analyze(image: ImageProxy) {
+            if (isBusy.compareAndSet(false, true)) {
+                val visionImage = InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees)
+                BarcodeScanning.getClient().process(visionImage)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            task.result?.let { result ->
+                                binding.barcodeOverlay.update(visionImage.mediaImage, result)
+                            }
+                        } else {
+                            Log.w("BarcodeAnalyzer", "failed to scan image: ${task.exception?.message}")
                         }
+                        image.close()
+                        isBusy.set(false)
                     }
-                    .addOnFailureListener {
-                        // You should really do something about Exceptions
-                    }
-                    .addOnCompleteListener {
-                        // It's important to close the imageProxy
-                        imageProxy.close()
-                    }
+            } else {
+                image.close()
             }
         }
     }
