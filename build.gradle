@@ -1,0 +1,31 @@
+ext {
+    camerax_version="1.1.0-alpha02"
+    camerax_view_version="1.0.0-alpha22"
+
+    mlkit_version = "16.1.4"
+}
+buildscript {
+    ext.kotlin_version = "1.4.31"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.2.0-beta05"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
