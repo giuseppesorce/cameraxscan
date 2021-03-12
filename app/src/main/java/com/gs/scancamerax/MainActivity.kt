@@ -2,6 +2,7 @@ package com.gs.scancamerax
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.gs.scancamerax.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -14,6 +15,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+
 
         binding.btScan.setOnClickListener {
             scanner = !scanner
@@ -40,6 +43,9 @@ class MainActivity : AppCompatActivity() {
                     scanBarcodeFragment,
                     ScanBarcodeFragment.TAG
                 )
+                binding.frameScannerFloating.afterMeasured {
+                    Log.d("scan", "Dimensions: ${this.width} x ${this.height}")
+                }
             }
             false -> {
                 deleteCameraScanner()
